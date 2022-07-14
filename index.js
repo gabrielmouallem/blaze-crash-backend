@@ -7,9 +7,9 @@ require("dotenv").config();
 mongo.connect();
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT ? process.env.PORT : 8000;
 
-const allowedOrigins = ["http://localhost:3000", process.env.HEROKU_HOST];
+const allowedOrigins = ["http://localhost:3000"];
 
 app.use(express.json());
 
