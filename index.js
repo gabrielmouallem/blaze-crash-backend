@@ -160,4 +160,5 @@ app.use("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
+  console.log({allowedOrigins});
 });
