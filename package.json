@@ -1,0 +1,21 @@
+{
+  "name": "blaze-crash-backend",
+  "version": "1.0.0",
+  "description": "Blaze Crash backend to serve data from Blaze Crash Analytics.",
+  "main": "index.js",
+  "author": "Gabriel José Mouallem Rodrigues",
+  "license": "MIT",
+  "scripts": {
+    "dev": "yarn nodemon ./index.js",
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "mongodb": "^4.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
