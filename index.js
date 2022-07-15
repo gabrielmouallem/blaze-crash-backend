@@ -31,38 +31,15 @@ app.use("/crash", async (req, res) => {
   try {
     console.log(`[${new Date().toISOString()}] /crash`);
     const db = mongo.getDb();
-    await db
-      .collection("Crashes")
-      .find({})
-      .sort({ date: -1 })
-      .toArray(function (err, data) {
-        if (err || !db) {
-          return res.status(400).send({ message: err });
-        }
-        res.send(data);
-      });
-  } catch (err) {
-    res.status(400).send({message: err})
-  }
-});
-
-app.use("/report", async (req, res) => {
-  try {
-    console.log(`[${new Date().toISOString()}] /report`);
     let query = {};
-  
-    if (!req?.body)
-      res.status(400).send({
-        message: "Missing request body",
-      });
-  
+
     if ("filters" in req.body) {
       const { filters } = req.body;
-  
+
       if ("startDate" in filters && "endDate" in filters) {
         const startDate = filters.startDate;
         const endDate = filters.endDate;
-  
+
         query = {
           date: {
             $gt: new Date(startDate),
@@ -71,7 +48,7 @@ app.use("/report", async (req, res) => {
         };
       } else if ("startDate" in filters) {
         const startDate = filters.startDate;
-  
+
         query = {
           date: {
             $gt: new Date(startDate),
@@ -79,7 +56,7 @@ app.use("/report", async (req, res) => {
         };
       } else if ("endDate" in filters) {
         const endDate = filters.endDate;
-  
+
         query = {
           date: {
             $lt: new Date(endDate),
@@ -87,10 +64,67 @@ app.use("/report", async (req, res) => {
         };
       }
     }
-  
+
+    await db
+      .collection("Crashes")
+      .find(query)
+      .sort({ date: -1 })
+      .toArray(function (err, data) {
+        if (err || !db) {
+          return res.status(400).send({ message: err });
+        }
+        res.send(data);
+      });
+  } catch (err) {
+    res.status(400).send({ message: err });
+  }
+});
+
+app.use("/report", async (req, res) => {
+  try {
+    console.log(`[${new Date().toISOString()}] /report`);
+    let query = {};
+
+    if (!req?.body)
+      res.status(400).send({
+        message: "Missing request body",
+      });
+
+    if ("filters" in req.body) {
+      const { filters } = req.body;
+
+      if ("startDate" in filters && "endDate" in filters) {
+        const startDate = filters.startDate;
+        const endDate = filters.endDate;
+
+        query = {
+          date: {
+            $gt: new Date(startDate),
+            $lt: new Date(endDate),
+          },
+        };
+      } else if ("startDate" in filters) {
+        const startDate = filters.startDate;
+
+        query = {
+          date: {
+            $gt: new Date(startDate),
+          },
+        };
+      } else if ("endDate" in filters) {
+        const endDate = filters.endDate;
+
+        query = {
+          date: {
+            $lt: new Date(endDate),
+          },
+        };
+      }
+    }
+
     if ("pattern" in req.body) {
       const { pattern } = req.body;
-  
+
       if ("type" in pattern) {
         if (pattern.type === "basic") {
           if (
@@ -101,7 +135,7 @@ app.use("/report", async (req, res) => {
             const balance = pattern.balance;
             const investment = pattern.investment;
             const multiplier = pattern.multiplier;
-  
+
             const result = await report.basic({
               query,
               balance,
@@ -125,7 +159,7 @@ app.use("/report", async (req, res) => {
             const investment = pattern.investment;
             const previous_multiplier = pattern.previous_multiplier;
             const profit_multiplier = pattern.profit_multiplier;
-  
+
             const result = await report.advanced({
               query,
               balance,
@@ -150,7 +184,7 @@ app.use("/report", async (req, res) => {
     } else
       res.status(400).send({ message: "Report is missing pattern attribute" });
   } catch (err) {
-    res.status(400).send({message: err})
+    res.status(400).send({ message: err });
   }
 });
 
@@ -160,5 +194,5 @@ app.use("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
-  console.log({allowedOrigins});
+  console.log({ allowedOrigins });
 });
